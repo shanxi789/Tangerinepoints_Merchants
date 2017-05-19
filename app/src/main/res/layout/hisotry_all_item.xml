@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@mipmap/bg06">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_history_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="20 Points"
+            android:layout_margin="10dp"
+            android:textColor="@color/black"
+            android:textSize="30sp" />
+        <ImageView
+            android:id="@+id/iv_history_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/icon_btn06"
+            android:layout_margin="10dp"
+            android:visibility="gone"/>
+        <TextView
+            android:id="@+id/tv_history_canceled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="canceled"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            android:textSize="18sp"/>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/tv_history_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Purchase:$20.23"
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp" />
+    <TextView
+        android:id="@+id/tv_history_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Customer:Rem"
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp" />
+    <TextView
+        android:id="@+id/tv_history_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="01/12/2016  11:45AM"
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="20dp"/>
+</LinearLayout>
