@@ -90,6 +90,8 @@ public class Constans {
     public static final String SH_TRANSACTION_CANCEL= "transaction/cancel";
     //同步一项未完成交易
     public final static String SYNC_PURCHASES ="transaction/sync/purchases";
+    //获得当前版本
+    public final static String GET_VERSION ="https://tangerinepoints.com/app-version-info/merchant/android.json";
 
 
 }

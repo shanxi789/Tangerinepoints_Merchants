@@ -2,6 +2,8 @@ package com.mzth.tangerinepoints_merchant.util;
 
 import android.os.Handler;
 
+import com.mzth.tangerinepoints_merchant.common.Constans;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -108,11 +110,18 @@ public class NetUtil {
 	 * @param mRequestCallBack 实现回调得到服务器返回数据
 	 */
 	private static void get(String action, Map<String, Object> params,final String Authorization,final String Instance, final RequestCallBack mRequestCallBack) {
-		final String requestUrl = getBaseUrl() + action + "?" + getParamsUrl(params);
+		String requestUrl = null;
+		if(action.equals(Constans.GET_VERSION)){
+			requestUrl = action;
+		}else{
+			requestUrl = getBaseUrl() + action + "?" + getParamsUrl(params);
+		}
+
+		final String finalRequestUrl = requestUrl;
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
-				RequestGetUrl(requestUrl, Authorization,Instance,mRequestCallBack);
+				RequestGetUrl(finalRequestUrl, Authorization,Instance,mRequestCallBack);
 			}
 		});
 	}
@@ -144,7 +153,7 @@ public class NetUtil {
 	/**
 	 * Get请求
 	 * */
-	private static boolean RequestGetUrl(String requestUrl, final String Authorization,final String Instance,final RequestCallBack mRequestCallBack) {
+	private static boolean RequestGetUrl(final String requestUrl, final String Authorization, final String Instance, final RequestCallBack mRequestCallBack) {
 		HttpURLConnection conn = null;
 		try {
 			URL url = new URL(requestUrl);
@@ -220,7 +229,19 @@ public class NetUtil {
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
+					String requestUrls = requestUrl.substring(0,requestUrl.indexOf("?"));
+					if(requestUrls.equals(getBaseUrl()+ Constans.SH_TRANSACTION_HISTORY)){
+						//在断网状态下，在History
+						mRequestCallBack.onFailure(e, "The device is not connected to the internet.");
+					}else if(requestUrls.equals(getBaseUrl()+ Constans.SH_OFFER)||requestUrls.equals(getBaseUrl()+ Constans.SH_COUPON)){
+						//在断网状态下，在Redeem界面
+						mRequestCallBack.onFailure(e, "The device is not connected to the internet.");
+					}else if(requestUrls.equals(getBaseUrl()+ Constans.SH_SENDING_TIERS)){
+						//在断网状态下，在Reward Points界面
+						mRequestCallBack.onFailure(e, "The device is not connected to  the internet. You can still reward points. The transaction will be completed when the device is online.");
+					}else{
 					mRequestCallBack.onFailure(e, "Parse Data Exception");
+					}
 				}
 			});
 			return false;

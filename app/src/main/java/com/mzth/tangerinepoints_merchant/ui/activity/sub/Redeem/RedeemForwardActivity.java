@@ -16,6 +16,7 @@ import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.CouponBean;
 import com.mzth.tangerinepoints_merchant.bean.InvoiceBean;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.SPName;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.util.GsonUtil;
@@ -122,8 +123,9 @@ public class RedeemForwardActivity extends BaseBussActivity {
         //map.put("customer_id",Constans.couponId);
         //map.put("coupon_id", Constans.customerId);
         //当前位置
-        String location = (String) SharedPreferencesUtil.getParam(_context,"location","");
-        map.put("location",Constans.location);
+        String location = (String) SharedPreferencesUtil.getParam(_context, SPName.location,"");
+        //map.put("location",Constans.location);
+        map.put("location",location);
         NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_REDEEM_COUPON,map,Authorization,Constans.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
 
             @Override

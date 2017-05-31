@@ -24,12 +24,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.SPName;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.util.DialogThridUtils;
 import com.mzth.tangerinepoints_merchant.util.GsonUtil;
 import com.mzth.tangerinepoints_merchant.util.NetUtil;
 import com.mzth.tangerinepoints_merchant.util.SharedPreferencesUtil;
+import com.mzth.tangerinepoints_merchant.util.StringUtil;
 import com.mzth.tangerinepoints_merchant.util.ToastUtil;
 
 import java.util.HashMap;
@@ -69,14 +71,15 @@ public class BusinessesActivity extends BaseBussActivity {
     @Override
     protected void initData() {
         super.initData();
+
         //商户的PIN  测试数据
-        et_merchant_pin.setText(Constans.MERCHANT_PIN);
+        //et_merchant_pin.setText(Constans.MERCHANT_PIN);
         //获得经纬度
         //获取地理位置管理器
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         //获取所有可用的位置提供器
         List<String> providers = locationManager.getProviders(true);
-        String pro = providers.get(0);
+        //String pro = providers.get(0);
         if (providers.contains(LocationManager.GPS_PROVIDER)) {
             //如果是GPS
             locationProvider = LocationManager.GPS_PROVIDER;
@@ -87,7 +90,7 @@ public class BusinessesActivity extends BaseBussActivity {
             //一个特殊地点的供应商
             locationProvider = LocationManager.PASSIVE_PROVIDER;
         }else {
-            ToastUtil.showShort(_context, "没有可用的位置提供器");
+            ToastUtil.showShort(_context, "There is no location provider available");
             return;
         }
         //获取Location
@@ -105,7 +108,12 @@ public class BusinessesActivity extends BaseBussActivity {
         if(location!=null){
             latitude = location.getLatitude();//经度
             longitude = location.getLongitude();//纬度
-            SharedPreferencesUtil.setParam(_context,"location",latitude+","+longitude);
+            SharedPreferencesUtil.setParam(_context, SPName.location,latitude+","+longitude);
+        }
+        if(!StringUtil.isEmpty((String) SharedPreferencesUtil.getParam(getApplicationContext(), "accessKey", ""))) {
+            //Authorization = (String) SharedPreferencesUtil.getParam(getApplicationContext(), "accessKey", "");
+            startActivity(HomeActivity.class,null);
+            onBackPressed();
         }
     }
 
@@ -116,7 +124,11 @@ public class BusinessesActivity extends BaseBussActivity {
         tv_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(!StringUtil.isEmpty(et_merchant_pin.getText().toString())){
                 StoreRequest();
+                }else{
+                    ToastUtil.showShort(_context,"Merchant PIN cannot be empty");
+                }
             }
         });
     }
@@ -126,7 +138,7 @@ public class BusinessesActivity extends BaseBussActivity {
         LoadDialog = DialogThridUtils.showWaitDialog(_context, "Getting Your Store , Loading...", false, false);
         Map<String, Object> map = new HashMap<String, Object>();
         //获取用户输入的pin
-        String pin = et_merchant_pin.getText().toString();
+        final String pin = et_merchant_pin.getText().toString();
         map.put("merchant_pin", pin);
         //获取设备的IMEI码
         //TelephonyManager mTm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
@@ -139,6 +151,7 @@ public class BusinessesActivity extends BaseBussActivity {
                 String businesses = GsonUtil.getJsonFromKey(json, "businesses");
                 Bundle bundle = new Bundle();
                 bundle.putString("businesses", businesses);
+                bundle.putString("pin",pin);
                 startActivity(LoginActivity.class, bundle);
                 finish();
                 DialogThridUtils.closeDialog(LoadDialog);//关闭动画

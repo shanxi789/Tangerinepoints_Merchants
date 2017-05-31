@@ -55,8 +55,9 @@ public class BackUpServices extends Service {
     //同步一项未完成交易
     private void UnfinishedRequest(String data){
         Map<String,Object> map = new HashMap<String,Object>();
-        String location = (String) SharedPreferencesUtil.getParam(getApplicationContext(),"location","");
-        map.put("location",Constans.location);//当前的地理位置
+        String location = (String) SharedPreferencesUtil.getParam(getApplicationContext(),SPName.location,"");
+        //map.put("location",Constans.location);//当前的地理位置
+        map.put("location",location);//当前的地理位置
         //待处理的交易数据
         map.put("txn_data",data);//待处理的交易数据
         NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SYNC_PURCHASES, map, (String) SharedPreferencesUtil.getParam(getApplicationContext(),"accessKey",""), Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {

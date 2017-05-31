@@ -18,6 +18,7 @@ import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.ui.adapter.sub.HistoryAllListAdapter;
 import com.mzth.tangerinepoints_merchant.util.GsonUtil;
 import com.mzth.tangerinepoints_merchant.util.NetUtil;
+import com.mzth.tangerinepoints_merchant.util.SharedPreferencesUtil;
 import com.mzth.tangerinepoints_merchant.util.StringUtil;
 import com.mzth.tangerinepoints_merchant.util.ToastUtil;
 import com.mzth.tangerinepoints_merchant.util.WeiboDialogUtils;
@@ -70,7 +71,14 @@ public class HistoryActivity extends BaseBussActivity {
         tv_all.setTextColor(_context.getResources().getColor(R.color.white));
         tv_all.setBackgroundResource(R.drawable.history_text_bg_no);
         type = "ALL";
-        HistoryRequest();
+        String history = (String) SharedPreferencesUtil.getParam(_context,"history","");
+        if(StringUtil.isEmpty(history)){
+            HistoryRequest();
+        }else {
+            List<HistoryAllBean> beanList = GsonUtil.getListFromJson(history, new TypeToken<List<HistoryAllBean>>() {
+            });
+            setDataToView(beanList);//分页加载
+        }
     }
 
     @Override
@@ -182,6 +190,7 @@ public class HistoryActivity extends BaseBussActivity {
             public void onSuccess(int statusCode, String json) {
                 //ToastUtil.showShort(_context,json);
                 String history = GsonUtil.getJsonFromKey(json,"history");
+                SharedPreferencesUtil.setParam(_context,"history",history);
                 List<HistoryAllBean> beanList = GsonUtil.getListFromJson(history,new TypeToken<List<HistoryAllBean>>(){});
                 setDataToView(beanList);//分页加载
                 finishRefresh();
@@ -224,10 +233,10 @@ public class HistoryActivity extends BaseBussActivity {
             if(!StringUtil.isEmpty(list)){
                 adapter.add(list);
                 if(list.size()<n){//如果 list的大小小于n返回的条数说明数据加载完毕
-                    ToastUtil.showShort(_context, "Data Loaded");
+                    ToastUtil.showShort(_context, "That's all.");
                 }
             }else {
-                ToastUtil.showShort(_context, "Data Loaded");
+                ToastUtil.showShort(_context, "That's all.");
             }
         }
     }

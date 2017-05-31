@@ -11,8 +11,10 @@ import android.widget.TextView;
 import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.HistoryAllBean;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.MainApplication;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.adapter.base.BaseInfoAdapter;
+import com.mzth.tangerinepoints_merchant.util.DialogUtil;
 import com.mzth.tangerinepoints_merchant.util.NetUtil;
 import com.mzth.tangerinepoints_merchant.util.SharedPreferencesUtil;
 import com.mzth.tangerinepoints_merchant.util.ToastUtil;
@@ -66,7 +68,7 @@ public class HistoryAllListAdapter extends BaseInfoAdapter<HistoryAllBean> {
             HistoryAllBean bean = list.get(position);
             tv_history_type.setText(bean.getTitle());
             tv_history_money.setText(bean.getDescription());
-            tv_history_name.setText("Customer:"+bean.getCustomerScreenName());
+            tv_history_name.setText("Customer: "+bean.getCustomerScreenName());
             if(bean.isCanceled()){//判断是否取消
                 iv_history_cancel.setVisibility(View.GONE);//void隐藏
                 tv_canceled.setVisibility(View.VISIBLE);//让取消的标记显示
@@ -75,39 +77,28 @@ public class HistoryAllListAdapter extends BaseInfoAdapter<HistoryAllBean> {
                 tv_canceled.setVisibility(View.GONE);//让取消的标记显示
             }
             //转换时间
-            String times= DateFormat.getDateTimeInstance(DateFormat.LONG, 3).format(new Date(bean.getTime()));
-            String timesub = "";
-            if(times.indexOf("上午")!=-1){
-                timesub = times.substring(times.indexOf("午")+1,times.length())+"AM";
-            }else{
-                timesub = times.substring(times.indexOf("午")+1,times.length())+"PM";
-            }
-            String time= DateFormat.getDateInstance(DateFormat.LONG, Locale.US).format(new Date(bean.getTime()));
-
-            tv_history_time.setText(time+"\t "+timesub);
+//            String times= DateFormat.getDateTimeInstance(DateFormat.LONG, 3).format(new Date(bean.getTime()));
+//            String timesub = "";
+//            if(times.indexOf("上午")!=-1){
+//                timesub = times.substring(times.indexOf("午")+1,times.length())+"AM";
+//            }else{
+//                timesub = times.substring(times.indexOf("午")+1,times.length())+"PM";
+//            }
+            //String time= DateFormat.getDateInstance(DateFormat.LONG, Locale.US).format(new Date(bean.getTime()));
+            String time1 = DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.MEDIUM, Locale.US).format(new Date(bean.getTime()));
+            tv_history_time.setText(time1);
             //取消一个当天的交易
             iv_history_cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AlertDialog.Builder builder=new AlertDialog.Builder(_context);
-                    builder.setMessage("Are you sure you want to cancel the deal?");
-                    builder.setTitle("Prompt");
-                    //确认按钮
-                    builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            CancleRequest(list.get(position).getTxnId());
-                            dialogInterface.dismiss();
-                        }
-                    });
-                    //取消按钮
-                    builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    });
-                    builder.show();
+                    DialogUtil.alertDialog(_context, "Confirmation", "Are you sure you want to exit?",
+                            "Confirm", "Cancel", true, new DialogUtil.ReshActivity() {
+                                @Override
+                                public void reshActivity() {//确定按钮
+                                    //将登录成功后返回的accesskey保存在sp中
+                                    CancleRequest(list.get(position).getTxnId());
+                                }
+                            });
 
                 }
             });

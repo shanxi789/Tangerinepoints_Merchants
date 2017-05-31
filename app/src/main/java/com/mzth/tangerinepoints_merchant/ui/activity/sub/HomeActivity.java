@@ -4,13 +4,17 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.CouponBean;
@@ -19,6 +23,7 @@ import com.mzth.tangerinepoints_merchant.bean.offer.OfferBean;
 import com.mzth.tangerinepoints_merchant.common.BackUpServices;
 import com.mzth.tangerinepoints_merchant.common.Constans;
 import com.mzth.tangerinepoints_merchant.common.MainApplication;
+import com.mzth.tangerinepoints_merchant.common.SPName;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.ui.activity.sub.History.HistoryActivity;
@@ -27,6 +32,7 @@ import com.mzth.tangerinepoints_merchant.ui.activity.sub.Redeem.RedeemCouponSure
 import com.mzth.tangerinepoints_merchant.ui.activity.sub.Redeem.RedeemForwardActivity;
 import com.mzth.tangerinepoints_merchant.ui.activity.sub.Redeem.RedeemOfferActivity;
 import com.mzth.tangerinepoints_merchant.ui.activity.sub.RewardPoints.RewardPointsActivity;
+import com.mzth.tangerinepoints_merchant.util.DialogUtil;
 import com.mzth.tangerinepoints_merchant.util.GsonUtil;
 import com.mzth.tangerinepoints_merchant.util.NetUtil;
 import com.mzth.tangerinepoints_merchant.util.SharedPreferencesUtil;
@@ -45,11 +51,13 @@ import java.util.Map;
  */
 
 public class HomeActivity extends BaseBussActivity {
-    private ImageView tv_rewardpoints, tv_redeem, tv_history;
+    //private ImageView tv_rewardpoints, tv_redeem, tv_history;
+    private TextView tv_rewardpoints, tv_redeem, tv_history,tv_version;
     private long mExitTime;
     private Dialog dialog;//加载动画的对话框
     private String str;//二维码扫码结果
-
+    private String version;//版本
+    private RelativeLayout rl_version;
     @Override
     protected void setCustomLayout(Bundle savedInstanceState) {
         super.setCustomLayout(savedInstanceState);
@@ -62,32 +70,42 @@ public class HomeActivity extends BaseBussActivity {
     protected void initView() {
         super.initView();
         //积分奖励
-        tv_rewardpoints= (ImageView) findViewById(R.id.tv_rewardpoints);
+        tv_rewardpoints = (TextView) findViewById(R.id.tv_rewardpoints);
         //兑换
-        tv_redeem= (ImageView) findViewById(R.id.tv_redeem);
+        tv_redeem = (TextView) findViewById(R.id.tv_redeem);
         //历史纪录
-        tv_history= (ImageView) findViewById(R.id.tv_history);
+        tv_history = (TextView) findViewById(R.id.tv_history);
+        //版本号布局
+        rl_version = (RelativeLayout) findViewById(R.id.rl_version);
+        //版本号
+        tv_version = (TextView) findViewById(R.id.tv_version);
     }
+
     @Override
     protected void initData() {
         super.initData();
         //启动后台服务  完成未完成的交易
         Intent intent = new Intent(_context, BackUpServices.class);
         startService(intent);
+        //GetVersion();//获得当前的版本
+        tv_version.setText(getVersionName());
     }
+
     @Override
     protected void BindComponentEvent() {
         super.BindComponentEvent();
         tv_rewardpoints.setOnClickListener(myonclick);
         tv_redeem.setOnClickListener(myonclick);
         tv_history.setOnClickListener(myonclick);
+        rl_version.setOnClickListener(myonclick);
     }
+
     private View.OnClickListener myonclick = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            switch (view.getId()){
+            switch (view.getId()) {
                 case R.id.tv_rewardpoints://积分奖励
-                    startActivity(RewardPointsActivity.class,null);
+                    startActivity(RewardPointsActivity.class, null);
                     break;
                 case R.id.tv_redeem://兑换 调用商品设备自带的扫码功能
                     //startActivity(RedeemActivity.class,null);
@@ -104,19 +122,21 @@ public class HomeActivity extends BaseBussActivity {
                     intent.putExtra("IDENTIFY_INVERSE_QR_CODE", true);// 识别反色二维码，默认true
                     intent.putExtra("IDENTIFY_MORE_CODE", false);// 识别画面中多个二维码，默认false
                     intent.putExtra("IS_SHOW_SETTING", true);// 是否显示右上角设置按钮，默认true
-                    intent.putExtra("IS_SHOW_ALBUM", true);// 是否显示从相册选择图片按钮，默认true
+                    intent.putExtra("IS_SHOW_ALBUM", false);// 是否显示从相册选择图片按钮，默认true
                     startActivityForResult(intent, 100);
                     break;
                 case R.id.tv_history://历史纪录
-                    startActivity(HistoryActivity.class,null);
+                    startActivity(HistoryActivity.class, null);
+                    break;
+                case R.id.rl_version://版本号布局
                     break;
             }
         }
     };
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if(intent!=null){
-            switch (requestCode){
+        if (intent != null) {
+            switch (requestCode) {
                 case 100://兑换扫码回调
                     Bundle bundle = intent.getExtras();
                     ArrayList<HashMap<String, String>> result = (ArrayList<HashMap<String, String>>)
@@ -129,20 +149,20 @@ public class HomeActivity extends BaseBussActivity {
                         str = hashMap.get("VALUE");
                     }
                     //优惠券二维码信息
-                    if(str.indexOf("coupon")!=-1){
+                    if (str.indexOf("coupon") != -1) {
                         //优惠券ID
-                        String couponId = str.substring(str.indexOf(",")+1,str.lastIndexOf(","));
+                        String couponId = str.substring(str.indexOf(",") + 1, str.lastIndexOf(","));
                         //用户ID
-                        String customerId = str.substring(str.lastIndexOf(",")+1,str.length());
-                        CouponRequest(couponId,customerId);//获取coupon信息请求
-                    }else if(str.indexOf("offer")!=-1){
+                        String customerId = str.substring(str.lastIndexOf(",") + 1, str.length());
+                        CouponRequest(couponId, customerId);//获取coupon信息请求
+                    } else if (str.indexOf("offer") != -1) {
                         //兑换ID
-                        String offerId = str.substring(str.indexOf(",")+1,str.lastIndexOf(","));
+                        String offerId = str.substring(str.indexOf(",") + 1, str.lastIndexOf(","));
                         //用户ID
-                        String customerId = str.substring(str.lastIndexOf(",")+1,str.length());
-                        GetOfferRequest(offerId,customerId);//获取offer信息请求
-                    }else{
-                        ToastUtil.showLong(_context,"Please scan the QR code for coupons and prizes");
+                        String customerId = str.substring(str.lastIndexOf(",") + 1, str.length());
+                        GetOfferRequest(offerId, customerId);//获取offer信息请求
+                    } else {
+                        ToastUtil.showLong(_context, "Please scan the QR code for coupons and prizes");
                     }
                     break;
             }
@@ -150,19 +170,20 @@ public class HomeActivity extends BaseBussActivity {
         super.onActivityResult(requestCode, resultCode, intent);
 
     }
+
     //获取coupon信息
-    private void CouponRequest(String couponId,String customerId){
-        dialog = WeiboDialogUtils.createLoadingDialog(_context,"Loading...");
+    private void CouponRequest(String couponId, String customerId) {
+        dialog = WeiboDialogUtils.createLoadingDialog(_context, "Loading...");
         //从coupon的二维码中解析出来的
-        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_COUPON+couponId,null,Authorization,Constans.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
+        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_COUPON + couponId, null, Authorization, Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
 
             @Override
             public void onSuccess(int statusCode, String json) {
-                String coupon = GsonUtil.getJsonFromKey(json,"coupon");
-                CouponBean bean =  GsonUtil.getBeanFromJson(coupon,CouponBean.class);
+                String coupon = GsonUtil.getJsonFromKey(json, "coupon");
+                CouponBean bean = GsonUtil.getBeanFromJson(coupon, CouponBean.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("bean",bean);
-                startActivity(RedeemForwardActivity.class,bundle);
+                bundle.putSerializable("bean", bean);
+                startActivity(RedeemForwardActivity.class, bundle);
                 WeiboDialogUtils.closeDialog(dialog);//关闭动画
             }
 
@@ -174,24 +195,25 @@ public class HomeActivity extends BaseBussActivity {
 
             @Override
             public void onFailure(Exception e, String errorMsg) {
-                ToastUtil.showShort(_context,errorMsg);
+                ToastUtil.showShort(_context, errorMsg);
                 WeiboDialogUtils.closeDialog(dialog);//关闭动画
             }
         });
     }
+
     //获取offer信息
-    private void GetOfferRequest(String offerId, final String customerId){
-        dialog = WeiboDialogUtils.createLoadingDialog(_context,"Loading...");
+    private void GetOfferRequest(String offerId, final String customerId) {
+        dialog = WeiboDialogUtils.createLoadingDialog(_context, "Loading...");
         //从offer的二维码中解析出来的
-        NetUtil.Request(NetUtil.RequestMethod.GET,Constans.SH_OFFER+offerId,null,Authorization,Constans.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
+        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_OFFER + offerId, null, Authorization, Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
-                String offer = GsonUtil.getJsonFromKey(json,"offer");
-                OfferBean offerBean = GsonUtil.getBeanFromJson(offer,OfferBean.class);
+                String offer = GsonUtil.getJsonFromKey(json, "offer");
+                OfferBean offerBean = GsonUtil.getBeanFromJson(offer, OfferBean.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("bean",offerBean);
-                bundle.putString("customerId",customerId);
-                startActivity(RedeemOfferActivity.class,bundle);
+                bundle.putSerializable("bean", offerBean);
+                bundle.putString("customerId", customerId);
+                startActivity(RedeemOfferActivity.class, bundle);
                 WeiboDialogUtils.closeDialog(dialog);//关闭动画
             }
 
@@ -203,18 +225,84 @@ public class HomeActivity extends BaseBussActivity {
 
             @Override
             public void onFailure(Exception e, String errorMsg) {
-                ToastUtil.showShort(_context,errorMsg);
+                ToastUtil.showShort(_context, errorMsg);
+                WeiboDialogUtils.closeDialog(dialog);//关闭动画
+            }
+        });
+    }
+    //获取当前应用的版本号：
+    private String getVersionName(){
+        // 获取packagemanager的实例
+        PackageManager packageManager = getPackageManager();
+        // getPackageName()是你当前类的包名，0代表是获取版本信息
+        PackageInfo packInfo = null;
+        try {
+            packInfo = packageManager.getPackageInfo(getPackageName(),0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        String version = packInfo.versionName;
+        return version;
+    }
+    //获得服务器的版本号
+    private void GetVersion() {
+        final Dialog dialog = WeiboDialogUtils.createLoadingDialog(_context, "Loading...");
+        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.GET_VERSION, null, null, null, new NetUtil.RequestCallBack() {
+            @Override
+            public void onSuccess(int statusCode, String json) {
+                version = GsonUtil.getJsonFromKey(json, "current");
+                tv_version.setText(version);
+                WeiboDialogUtils.closeDialog(dialog);//关闭动画
+            }
+
+            @Override
+            public void onFailure(int statusCode, String errorMsg) {
+                ToastUtil.showShort(_context, errorMsg);
+                WeiboDialogUtils.closeDialog(dialog);//关闭动画
+            }
+
+            @Override
+            public void onFailure(Exception e, String errorMsg) {
+                ToastUtil.showShort(_context, errorMsg);
                 WeiboDialogUtils.closeDialog(dialog);//关闭动画
             }
         });
     }
     @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (event.getRepeatCount() == 0) {
+                onBackPressed();
+            } else {
+                //System.exit(0);
+                //ToastUtil.showShort(_context, "长按了啊啊啊");
+                DialogUtil.alertDialog(_context, "Prompt", "Are you sure you want to exit?",
+                        "Confirm", "Cancel", true, new DialogUtil.ReshActivity() {
+                            @Override
+                            public void reshActivity() {//确定按钮
+                                //将登录成功后返回的accesskey保存在sp中
+                                SharedPreferencesUtil.setParam(_context, "accessKey","");
+                                SharedPreferencesUtil.setParam(_context, SPName.location,"");
+                                MainApplication.closeActivity();
+                            }
+                        });
+            }
+        }
+        return false;
+    }
+
+    @Override
     public void onBackPressed() {
         if ((System.currentTimeMillis() - mExitTime) > 2000) {
-            ToastUtil.showShort(this, "Press logout again");
+            ToastUtil.showShort(this, "Press the exit again");
             mExitTime = System.currentTimeMillis();
         } else {
             MainApplication.closeActivity();
         }
     }
+
+
+
+
 }

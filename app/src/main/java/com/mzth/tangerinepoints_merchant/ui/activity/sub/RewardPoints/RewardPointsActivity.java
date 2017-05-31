@@ -1,10 +1,12 @@
 package com.mzth.tangerinepoints_merchant.ui.activity.sub.RewardPoints;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -24,6 +26,8 @@ import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static java.lang.StrictMath.min;
 
@@ -57,6 +61,19 @@ public class RewardPointsActivity extends BaseBussActivity {
         btn_cancel= (ImageView) findViewById(R.id.btn_cancel);
         //输入的积分
         et_integral= (EditText) findViewById(R.id.et_integral);
+        //显示软键盘
+        et_integral.setFocusable(true);
+        et_integral.setFocusableInTouchMode(true);
+        et_integral.requestFocus();
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                InputMethodManager inputManager =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputManager.showSoftInput(et_integral, 0);
+            }
+                       },
+                200);
     }
     @Override
     protected void initData() {
@@ -141,7 +158,7 @@ public class RewardPointsActivity extends BaseBussActivity {
                     if(!StringUtil.isEmpty(et_integral.getText().toString())){
                        Point();//点数梯度计算公式
                     }else{
-                        ToastUtil.showShort(_context,"请输入金额");
+                        ToastUtil.showShort(_context,"Please enter the amount.");
                     }
                     break;
                 case R.id.btn_cancel: //取消
@@ -194,8 +211,21 @@ public class RewardPointsActivity extends BaseBussActivity {
         if(!StringUtil.isEmpty(CacheUtil.getValue(_context, "SpendingTiersBean"))){
             //查看缓存中的点数梯度公式是否超过10分钟未更新
             if((time-(long)CacheUtil.getValue(_context,"CurrentTime"))>minutes) {
-            ToastUtil.showLong(_context,"Preparing gradient formulas for you...");
+                //ToastUtil.showLong(_context,"Preparing gradient formulas for you...");
                 TiersRequest();
+                SpendingTiersBean bean2 = (SpendingTiersBean) CacheUtil.getValue(_context, "SpendingTiersBean");
+                double tier_3_min = bean2.getTier3Min();
+                double tier_2_min = bean2.getTier2Min();
+                double tier_1_min = bean2.getTier1Min();
+                //消费金额。2位小数点
+                S=Double.parseDouble(et_integral.getText().toString());
+                int p=calculatePoints(S,tier_1_min,tier_2_min,tier_3_min);//梯度公式
+                Bundle bundle = new Bundle();
+                bundle.putString("money",S+"");
+                //要发放的点数。由梯度计算公式得出。
+                bundle.putInt("points",p);
+                startActivity(IntegralDetailsActivity.class,bundle);
+                finish();
         }else{
             SpendingTiersBean bean2 = (SpendingTiersBean) CacheUtil.getValue(_context, "SpendingTiersBean");
             double tier_3_min = bean2.getTier3Min();
@@ -212,7 +242,7 @@ public class RewardPointsActivity extends BaseBussActivity {
                 finish();
         }
         }else{
-            ToastUtil.showLong(_context,"Preparing gradient formulas for you...");
+            ToastUtil.showLong(_context,"Internet connection is required to compelte this transaction.");
             TiersRequest();
         }
     }

@@ -21,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.BusinessesBean;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.SPName;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.ui.adapter.sub.StoreListAdapter;
@@ -52,6 +53,7 @@ public class LoginActivity extends BaseBussActivity {
     private RadioButton radioButton;//单选按钮
     private List<BusinessesBean> beans;//商店列表
     private String BusinessId;//商店id
+    private String pin;//商户pin
     private HashMap<String,String> map;//用于根据商店名字找到对应的商店ID
     @Override
     protected void setCustomLayout(Bundle savedInstanceState) {
@@ -90,6 +92,7 @@ public class LoginActivity extends BaseBussActivity {
 
         Intent intent=getIntent();
         String businesses=intent.getStringExtra("businesses");
+        pin = intent.getStringExtra("pin");
         //判断该商户旗下是否有商店
         if(StringUtil.isEmpty(businesses)){
             //如果为空就显示 没有发现商店的布局
@@ -120,7 +123,8 @@ public class LoginActivity extends BaseBussActivity {
             @Override
             public void onClick(View view) {
                 BusinessId = map.get(radioButton.getText().toString());
-                ToastUtil.showShort(_context,BusinessId);
+                radioButton.setTextColor(getResources().getColor(R.color.orange_red));
+                //ToastUtil.showShort(_context,BusinessId);
             }
         });
 //        lv_business.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -152,13 +156,14 @@ public class LoginActivity extends BaseBussActivity {
     private void LoginRequest(){
         LoadDialog = DialogThridUtils.showWaitDialog(_context,"Loging...",false,false);
         Map<String,Object> map = new HashMap<String,Object>();
-        map.put("merchant_pin",Constans.MERCHANT_PIN);//商户身份识别码
+        map.put("merchant_pin",pin);//商户身份识别码
         map.put("business_id",BusinessId);//要登录的商店UUID
         map.put("app_instance_id",Constans.APP_INSTANCE_ID);//在APP安装时生成并保存的一个随机的UUID，用于唯一标识一个APP实例
         map.put("device_imei", Constans.DEVICE_IMEI);//设备的IMEI码
         //得到当前位置的坐标
-        String location = (String) SharedPreferencesUtil.getParam(_context,"location","");
-        map.put("location",Constans.location);//表示位置信息的字符串
+        String location = (String) SharedPreferencesUtil.getParam(_context, SPName.location,"");
+        //map.put("location",Constans.location);//表示位置信息的字符串
+        map.put("location",location);//表示位置信息的字符串
         NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_LOGIN, map,null,null, new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
