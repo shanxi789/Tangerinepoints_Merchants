@@ -22,8 +22,11 @@ import android.widget.TextView;
 
 import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.MainApplication;
+import com.mzth.tangerinepoints_merchant.common.SPName;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.util.NetUtil;
+import com.mzth.tangerinepoints_merchant.util.SharedPreferencesUtil;
 import com.mzth.tangerinepoints_merchant.util.SoundUtils;
 import com.mzth.tangerinepoints_merchant.util.StringUtil;
 import com.mzth.tangerinepoints_merchant.util.ToastUtil;
@@ -296,8 +299,10 @@ public class RPScanCodeActivity extends BaseBussActivity implements SurfaceHolde
         map.put("purchase_amount",money);
         //要发放的点数。由梯度计算公式得出。
         map.put("points",points);
-        map.put("location",Constans.location);
-        NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_REWARD_POINTS, map,Authorization,Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
+        String location = (String) SharedPreferencesUtil.getParam(_context, SPName.location,"");
+        map.put("location",location);
+        //map.put("location",Constans.location);
+        NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_REWARD_POINTS, map,Authorization, MainApplication.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
                 ToastUtil.showShort(_context,json);

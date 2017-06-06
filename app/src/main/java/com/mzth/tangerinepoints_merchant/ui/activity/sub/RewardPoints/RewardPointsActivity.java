@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.SpendingTiersBean;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.MainApplication;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.util.CacheUtil;
@@ -154,12 +155,16 @@ public class RewardPointsActivity extends BaseBussActivity {
         public void onClick(View view) {
             switch (view.getId()){
                 case R.id.btn_next: //点击下一步
-
-                    if(!StringUtil.isEmpty(et_integral.getText().toString())){
-                       Point();//点数梯度计算公式
-                    }else{
-                        ToastUtil.showShort(_context,"Please enter the amount.");
+                    if(StringUtil.isEmpty(et_integral.getText().toString())){
+                        ToastUtil.showShort(_context,"Please enter the number to be issued.");
+                        return;
                     }
+                    if(et_integral.getText().toString().equals(0.00)||et_integral.getText().toString().equals(.00)){
+                        ToastUtil.showShort(_context,"You must issue an integral greater than 0.");
+                        return;
+                    }
+                    Point();
+
                     break;
                 case R.id.btn_cancel: //取消
                     finish();
@@ -259,7 +264,7 @@ public class RewardPointsActivity extends BaseBussActivity {
     //获取消费等级划分
     private void TiersRequest(){
         dialog = WeiboDialogUtils.createLoadingDialog(_context,"Loading...");
-        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_SENDING_TIERS, null, Authorization,Constans.APP_INSTANCE_ID,new NetUtil.RequestCallBack() {
+        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_SENDING_TIERS, null, Authorization, MainApplication.APP_INSTANCE_ID,new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
                 //ToastUtil.showShort(_context,json);

@@ -145,7 +145,11 @@ public class NetUtil {
 		executorService.submit(new Runnable() {
 			@Override
 			public void run() {
-				RequestPostUpLoadFile(getBaseUrl() + action, map,files,Authorization,Instance, mRequestCallBack);
+				if(action.equals(Constans.GET_LOCATION)){//如果是定位请求则直接action
+					RequestPostUpLoadFile(action, map,files,Authorization,Instance, mRequestCallBack);
+				}else{
+					RequestPostUpLoadFile(getBaseUrl() + action, map,files,Authorization,Instance, mRequestCallBack);
+				}
 			}
 		});
 	}
@@ -192,7 +196,7 @@ public class NetUtil {
 					public void run() {
 						if(responseCode >= HttpURLConnection.HTTP_BAD_REQUEST && responseCode < HttpURLConnection.HTTP_INTERNAL_ERROR){
 							// 4XX 状态码表示请求可能出错
-							mRequestCallBack.onFailure(responseCode, "Request Exception");
+							mRequestCallBack.onFailure(responseCode, "The requested item of redemption is not from here.");
 						} else if(responseCode >= HttpURLConnection.HTTP_INTERNAL_ERROR){
 							// 5XX 状态码表示服务器可能出错
 							if(responseCode==500){

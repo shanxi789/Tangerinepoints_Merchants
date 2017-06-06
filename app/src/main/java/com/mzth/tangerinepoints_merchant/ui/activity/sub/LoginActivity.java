@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v4.widget.NestedScrollView;
+import android.telephony.TelephonyManager;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.ForegroundColorSpan;
@@ -21,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.BusinessesBean;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.MainApplication;
 import com.mzth.tangerinepoints_merchant.common.SPName;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
@@ -158,8 +160,12 @@ public class LoginActivity extends BaseBussActivity {
         Map<String,Object> map = new HashMap<String,Object>();
         map.put("merchant_pin",pin);//商户身份识别码
         map.put("business_id",BusinessId);//要登录的商店UUID
-        map.put("app_instance_id",Constans.APP_INSTANCE_ID);//在APP安装时生成并保存的一个随机的UUID，用于唯一标识一个APP实例
-        map.put("device_imei", Constans.DEVICE_IMEI);//设备的IMEI码
+        map.put("app_instance_id", MainApplication.APP_INSTANCE_ID);//在APP安装时生成并保存的一个随机的UUID，用于唯一标识一个APP实例
+        //map.put("device_imei", Constans.DEVICE_IMEI);//设备的IMEI码
+        //获取设备的IMEI码
+        TelephonyManager mTm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        String imel = mTm.getDeviceId();
+        map.put("device_imei", imel);
         //得到当前位置的坐标
         String location = (String) SharedPreferencesUtil.getParam(_context, SPName.location,"");
         //map.put("location",Constans.location);//表示位置信息的字符串

@@ -23,6 +23,7 @@ import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.CouponBean;
 import com.mzth.tangerinepoints_merchant.bean.offer.OfferBean;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.MainApplication;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.util.GsonUtil;
 import com.mzth.tangerinepoints_merchant.util.NetUtil;
@@ -354,7 +355,7 @@ public class RedeemActivity extends BaseBussActivity implements SurfaceHolder.Ca
     private void CouponRequest(String couponId,String customerId){
         dialog = WeiboDialogUtils.createLoadingDialog(_context,"Loading...");
         //从coupon的二维码中解析出来的
-        NetUtil.Request(NetUtil.RequestMethod.GET,Constans.SH_COUPON+couponId,null,Authorization,Constans.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
+        NetUtil.Request(NetUtil.RequestMethod.GET,Constans.SH_COUPON+couponId,null,Authorization, MainApplication.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
 
             @Override
             public void onSuccess(int statusCode, String json) {
@@ -384,7 +385,7 @@ public class RedeemActivity extends BaseBussActivity implements SurfaceHolder.Ca
     private void GetOfferRequest(String offerId, final String customerId){
         dialog = WeiboDialogUtils.createLoadingDialog(_context,"Loading...");
         //从offer的二维码中解析出来的
-        NetUtil.Request(NetUtil.RequestMethod.GET,Constans.SH_OFFER+offerId,null,Authorization,Constans.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
+        NetUtil.Request(NetUtil.RequestMethod.GET,Constans.SH_OFFER+offerId,null,Authorization,MainApplication.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
             @Override
             public void onSuccess(int statusCode, String json) {
                 ToastUtil.showShort(_context,json);

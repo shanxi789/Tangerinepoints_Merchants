@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.view.KeyEvent;
@@ -58,6 +59,7 @@ public class HomeActivity extends BaseBussActivity {
     private String str;//二维码扫码结果
     private String version;//版本
     private RelativeLayout rl_version;
+
     @Override
     protected void setCustomLayout(Bundle savedInstanceState) {
         super.setCustomLayout(savedInstanceState);
@@ -79,11 +81,13 @@ public class HomeActivity extends BaseBussActivity {
         rl_version = (RelativeLayout) findViewById(R.id.rl_version);
         //版本号
         tv_version = (TextView) findViewById(R.id.tv_version);
+
     }
 
     @Override
     protected void initData() {
         super.initData();
+
         //启动后台服务  完成未完成的交易
         Intent intent = new Intent(_context, BackUpServices.class);
         startService(intent);
@@ -175,7 +179,7 @@ public class HomeActivity extends BaseBussActivity {
     private void CouponRequest(String couponId, String customerId) {
         dialog = WeiboDialogUtils.createLoadingDialog(_context, "Loading...");
         //从coupon的二维码中解析出来的
-        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_COUPON + couponId, null, Authorization, Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
+        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_COUPON + couponId, null, Authorization, MainApplication.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
 
             @Override
             public void onSuccess(int statusCode, String json) {
@@ -205,7 +209,7 @@ public class HomeActivity extends BaseBussActivity {
     private void GetOfferRequest(String offerId, final String customerId) {
         dialog = WeiboDialogUtils.createLoadingDialog(_context, "Loading...");
         //从offer的二维码中解析出来的
-        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_OFFER + offerId, null, Authorization, Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
+        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_OFFER + offerId, null, Authorization, MainApplication.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
                 String offer = GsonUtil.getJsonFromKey(json, "offer");

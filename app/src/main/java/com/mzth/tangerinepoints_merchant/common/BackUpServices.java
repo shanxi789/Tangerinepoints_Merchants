@@ -60,7 +60,7 @@ public class BackUpServices extends Service {
         map.put("location",location);//当前的地理位置
         //待处理的交易数据
         map.put("txn_data",data);//待处理的交易数据
-        NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SYNC_PURCHASES, map, (String) SharedPreferencesUtil.getParam(getApplicationContext(),"accessKey",""), Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
+        NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SYNC_PURCHASES, map, (String) SharedPreferencesUtil.getParam(getApplicationContext(),"accessKey",""), MainApplication.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
                 //ToastUtil.showShort(getApplicationContext(),json);

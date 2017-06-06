@@ -109,7 +109,7 @@ public class HistoryAllListAdapter extends BaseInfoAdapter<HistoryAllBean> {
             final Dialog dialog = WeiboDialogUtils.createLoadingDialog(_context,"Loading...");
             Map<String,Object> map = new HashMap<String,Object>();
             map.put("txn_id",id);
-            NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_TRANSACTION_CANCEL, map, (String) SharedPreferencesUtil.getParam(_context,"accessKey",""), Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
+            NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_TRANSACTION_CANCEL, map, (String) SharedPreferencesUtil.getParam(_context,"accessKey",""), MainApplication.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
                 @Override
                 public void onSuccess(int statusCode, String json) {
                     ToastUtil.showShort(_context,"Cancel Success");

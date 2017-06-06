@@ -1,5 +1,6 @@
 package com.mzth.tangerinepoints_merchant.ui.activity.sub.Redeem;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,6 +19,7 @@ public class RedeemSuccessActivity extends BaseBussActivity {
     private TextView tv_redeem_info;
     private ImageView btn_redeem_ok;
     private OfferBean bean;//商品的对象
+    private MediaPlayer mp;//mediaPlayer对象
     @Override
     protected void setCustomLayout(Bundle savedInstanceState) {
         super.setCustomLayout(savedInstanceState);
@@ -32,11 +34,14 @@ public class RedeemSuccessActivity extends BaseBussActivity {
         tv_redeem_info = (TextView) findViewById(R.id.tv_redeem_info);
         //兑换成功好的ok
         btn_redeem_ok = (ImageView) findViewById(R.id.btn_redeem_ok);
+        //创建mediaplayer对象
+        mp= MediaPlayer.create(_context, R.raw.reward);
     }
 
     @Override
     protected void initData() {
         super.initData();
+        mp.start();//开始播放
         bean = (OfferBean) getIntent().getSerializableExtra("bean");
         tv_redeem_info.setText("The customer redeemed offer "+bean.getItemName()
                 +" for "+bean.getPoints()+" points.");
@@ -60,5 +65,9 @@ public class RedeemSuccessActivity extends BaseBussActivity {
         }
     };
 
-
+    @Override
+    protected void onDestroy() {
+        mp.release();//释放资源
+        super.onDestroy();
+    }
 }

@@ -16,9 +16,11 @@ import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.CouponBean;
 import com.mzth.tangerinepoints_merchant.bean.InvoiceBean;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.MainApplication;
 import com.mzth.tangerinepoints_merchant.common.SPName;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
+import com.mzth.tangerinepoints_merchant.util.DialogUtil;
 import com.mzth.tangerinepoints_merchant.util.GsonUtil;
 import com.mzth.tangerinepoints_merchant.util.NetUtil;
 import com.mzth.tangerinepoints_merchant.util.SharedPreferencesUtil;
@@ -88,26 +90,33 @@ public class RedeemForwardActivity extends BaseBussActivity {
                     SureCouponRequest();//确认接受coupon
                     break;
                 case R.id.btn_redeem_cancel://取消按钮
-                    AlertDialog.Builder builder=new AlertDialog.Builder(_context);
-                    builder.setMessage("Are you sure you want to cancel the deal?");
-                    builder.setTitle("Prompt");
-                    //确认按钮
-                    builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            //CancleRequest();//取消一个当天的交易
-                            dialogInterface.dismiss();
-                            finish();
-                        }
-                    });
-                    //取消按钮
-                    builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.dismiss();
-                        }
-                    });
-                    builder.show();
+                    DialogUtil.alertDialog(_context, "Prompt", "Are you sure you want to exit?",
+                            "Yes", "No", true, new DialogUtil.ReshActivity() {
+                                @Override
+                                public void reshActivity() {//确定按钮
+                                    finish();
+                                }
+                            });
+//                    AlertDialog.Builder builder=new AlertDialog.Builder(_context);
+//                    builder.setMessage("Are you sure you want to cancel the deal?");
+//                    builder.setTitle("Prompt");
+//                    //确认按钮
+//                    builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            //CancleRequest();//取消一个当天的交易
+//                            dialogInterface.dismiss();
+//                            finish();
+//                        }
+//                    });
+//                    //取消按钮
+//                    builder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            dialogInterface.dismiss();
+//                        }
+//                    });
+//                    builder.show();
                     break;
             }
         }
@@ -126,7 +135,7 @@ public class RedeemForwardActivity extends BaseBussActivity {
         String location = (String) SharedPreferencesUtil.getParam(_context, SPName.location,"");
         //map.put("location",Constans.location);
         map.put("location",location);
-        NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_REDEEM_COUPON,map,Authorization,Constans.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
+        NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_REDEEM_COUPON,map,Authorization, MainApplication.APP_INSTANCE_ID,new NetUtil.RequestCallBack(){
 
             @Override
             public void onSuccess(int statusCode, String json) {

@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mzth.tangerinepoints_merchant.R;
 import com.mzth.tangerinepoints_merchant.bean.HistoryAllBean;
 import com.mzth.tangerinepoints_merchant.common.Constans;
+import com.mzth.tangerinepoints_merchant.common.MainApplication;
 import com.mzth.tangerinepoints_merchant.common.ToastHintMsgUtil;
 import com.mzth.tangerinepoints_merchant.ui.activity.base.BaseBussActivity;
 import com.mzth.tangerinepoints_merchant.ui.adapter.sub.HistoryAllListAdapter;
@@ -72,13 +73,13 @@ public class HistoryActivity extends BaseBussActivity {
         tv_all.setBackgroundResource(R.drawable.history_text_bg_no);
         type = "ALL";
         String history = (String) SharedPreferencesUtil.getParam(_context,"history","");
-        if(StringUtil.isEmpty(history)){
+        //if(StringUtil.isEmpty(history)){
             HistoryRequest();
-        }else {
-            List<HistoryAllBean> beanList = GsonUtil.getListFromJson(history, new TypeToken<List<HistoryAllBean>>() {
-            });
-            setDataToView(beanList);//分页加载
-        }
+//        }else {
+//            List<HistoryAllBean> beanList = GsonUtil.getListFromJson(history, new TypeToken<List<HistoryAllBean>>() {
+//            });
+//            setDataToView(beanList);//分页加载
+//        }
     }
 
     @Override
@@ -185,7 +186,7 @@ public class HistoryActivity extends BaseBussActivity {
         map.put("start_index",index);
         map.put("n",n);
         map.put("type",type);
-        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_TRANSACTION_HISTORY, map, Authorization, Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
+        NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_TRANSACTION_HISTORY, map, Authorization, MainApplication.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
                 //ToastUtil.showShort(_context,json);

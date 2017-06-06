@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
@@ -48,6 +49,7 @@ public class IntegralDetailsActivity extends BaseBussActivity {
     private String money,str;
     private int points;
     private Dialog dialog;//显示加载动画的对话框
+    private MediaPlayer mp;//mediaPlayer对象
     @Override
     protected void setCustomLayout(Bundle savedInstanceState) {
         super.setCustomLayout(savedInstanceState);
@@ -66,7 +68,9 @@ public class IntegralDetailsActivity extends BaseBussActivity {
         tv_rp_money = (TextView) findViewById(R.id.tv_rp_money);
         //成功后显示的积分
         tv_integral= (TextView) findViewById(R.id.tv_integral);
+
     }
+
     @Override
     protected void initData() {
         super.initData();
@@ -160,9 +164,9 @@ public class IntegralDetailsActivity extends BaseBussActivity {
         map.put("points",points);
         //得到的当前位置
         String location = (String) SharedPreferencesUtil.getParam(_context, SPName.location,"");
-        map.put("location", Constans.location);
-        //map.put("location", location);
-        NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_REWARD_POINTS, map,Authorization,Constans.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
+        //map.put("location", Constans.location);
+        map.put("location", location);
+        NetUtil.Request(NetUtil.RequestMethod.POST, Constans.SH_REWARD_POINTS, map,Authorization,MainApplication.APP_INSTANCE_ID, new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
                 ToastUtil.showShort(_context,"Integral Success");
@@ -191,7 +195,7 @@ public class IntegralDetailsActivity extends BaseBussActivity {
     //离线发放积分
     private void OfflineIntegration(String customerId){
         OfflineIntegrationBean bean = new OfflineIntegrationBean();
-        bean.setId(Constans.APP_INSTANCE_ID);//UUID
+        bean.setId(MainApplication.APP_INSTANCE_ID);//UUID
         bean.setTxn_type("PURCHASE");//类型
         bean.setCustomer_id(customerId);//用户ID
         bean.setPoints(points);//点数

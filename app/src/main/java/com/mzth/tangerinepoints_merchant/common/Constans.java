@@ -92,6 +92,8 @@ public class Constans {
     public final static String SYNC_PURCHASES ="transaction/sync/purchases";
     //获得当前版本
     public final static String GET_VERSION ="https://tangerinepoints.com/app-version-info/merchant/android.json";
+    //定位
+    public final static String GET_LOCATION ="http://www.google.com/loc/json";
 
 
 }
