@@ -92,7 +92,7 @@ public class HistoryAllListAdapter extends BaseInfoAdapter<HistoryAllBean> {
                 @Override
                 public void onClick(View v) {
                     DialogUtil.alertDialog(_context, "Confirmation", "Are you sure you want to exit?",
-                            "Confirm", "Cancel", true, new DialogUtil.ReshActivity() {
+                            "Yes", "No", true, new DialogUtil.ReshActivity() {
                                 @Override
                                 public void reshActivity() {//确定按钮
                                     //将登录成功后返回的accesskey保存在sp中

@@ -44,7 +44,7 @@ public class RewardPointsActivity extends BaseBussActivity {
     private long CurrentTime;
     //用户输入的金额
     private double S;
-    private Dialog dialog;//加载时的动画弹框
+
     @Override
     protected void setCustomLayout(Bundle savedInstanceState) {
         super.setCustomLayout(savedInstanceState);
@@ -263,7 +263,7 @@ public class RewardPointsActivity extends BaseBussActivity {
 
     //获取消费等级划分
     private void TiersRequest(){
-        dialog = WeiboDialogUtils.createLoadingDialog(_context,"Loading...");
+        //final  Dialog dialog = WeiboDialogUtils.createLoadingDialog(_context,"Loading...");
         NetUtil.Request(NetUtil.RequestMethod.GET, Constans.SH_SENDING_TIERS, null, Authorization, MainApplication.APP_INSTANCE_ID,new NetUtil.RequestCallBack() {
             @Override
             public void onSuccess(int statusCode, String json) {
@@ -277,19 +277,19 @@ public class RewardPointsActivity extends BaseBussActivity {
                 //将当前时间保存到缓存
                 CacheUtil.putValue(_context,"CurrentTime",CurrentTime);
                 //ToastUtil.showShort(_context,CacheUtil.getValue(_context,"CurrentTime")+"");
-                WeiboDialogUtils.closeDialog(dialog);//关闭这个动画
+                //WeiboDialogUtils.closeDialog(dialog);//关闭这个动画
             }
 
             @Override
             public void onFailure(int statusCode, String errorMsg) {
                 ToastUtil.showShort(_context, ToastHintMsgUtil.getToastMsg(errorMsg));
-                WeiboDialogUtils.closeDialog(dialog);//关闭这个动画
+                //WeiboDialogUtils.closeDialog(dialog);//关闭这个动画
             }
 
             @Override
             public void onFailure(Exception e, String errorMsg) {
                 ToastUtil.showShort(_context,errorMsg);
-                WeiboDialogUtils.closeDialog(dialog);//关闭这个动画
+                //WeiboDialogUtils.closeDialog(dialog);//关闭这个动画
             }
         });
     }

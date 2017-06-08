@@ -181,12 +181,13 @@ public class BusinessesActivity extends BaseBussActivity {
             latitude = location.getLatitude();//经度
             longitude = location.getLongitude();//纬度
         }
+ */
         if (!StringUtil.isEmpty((String) SharedPreferencesUtil.getParam(getApplicationContext(), "accessKey", ""))) {
             //Authorization = (String) SharedPreferencesUtil.getParam(getApplicationContext(), "accessKey", "");
             startActivity(HomeActivity.class, null);
             onBackPressed();
         }
- */
+
     }
 
     @Override
